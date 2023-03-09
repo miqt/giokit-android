@@ -14,6 +14,7 @@ import org.json.JSONObject
  */
 object GioDatabase {
 
+    var index = 0L
     /**
      * 插入2.0数据
      */
@@ -25,7 +26,7 @@ object GioDatabase {
             val jsonObject = JSONObject(data)
             gioEvent.data = jsonObject.toString(2)
             gioEvent.time = jsonObject.optLong("itime")
-            gioEvent.gsid = 1
+            gioEvent.gsid = index++
             gioEvent.type =
                 if (jsonObject.has("event")) jsonObject.optString("event") else jsonObject.optString(
                     "ltype"

@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.os.Build
+import android.text.TextUtils
 import com.growingio.giokit.hook.GioPluginConfig
 import com.growingio.giokit.launch.sdkinfo.SdkInfo
 import org.json.JSONException
@@ -105,23 +106,28 @@ object SdkV3InfoUtils {
 
 
     fun getEventAlphaBet(eventType: String): String {
-        return "getEventAlphaBet"
+       return if (eventType.equals("Start")){
+           "KIT"
+       }else if(eventType.startsWith("$")){
+           "A"
+       }else{
+           "C"
+       }
     }
 
     fun getEventDesc(eventType: String, data: String): String {
         try {
             val jsonObj = JSONObject(data)
-            // custom name
-            val name = jsonObj.optString("eventName")
-            if (name.isNotEmpty()) return name
-
-            // page
-            val p = jsonObj.optString("path")
-            if (p.isNotEmpty()) return p
-
-
-            return jsonObj.optString("appName")
-
+            val url = jsonObj.getJSONObject("lprops").optString("\$url")
+            if (!TextUtils.isEmpty(url)){
+                val index = url.lastIndexOf(".")
+                if (index!=-1){
+                    return url.substring(index,url.length)
+                }
+                return url
+            }else{
+                return "desc"
+            }
         } catch (e: JSONException) {
         }
         return data

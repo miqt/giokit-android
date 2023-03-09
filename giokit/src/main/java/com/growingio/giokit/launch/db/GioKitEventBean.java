@@ -12,7 +12,7 @@ import androidx.room.PrimaryKey;
  *
  * @author cpacm 2021/8/30
  */
-@Entity(tableName = "events", indices = {@Index(value = {"gsid"}, unique = true)})
+@Entity(tableName = "events", indices = {@Index(value = {"gsid"}, unique = false)})
 public class GioKitEventBean {
 
     @Ignore

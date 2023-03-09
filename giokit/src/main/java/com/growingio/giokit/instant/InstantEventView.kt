@@ -115,7 +115,7 @@ class InstantEventView(context: Context) : FloatViewContainer(context) {
                 val data = instantData.events.first()
                 holder.textAliasTv.setText(CheckSdkStatusManager.getInstance().getEventAlphaBet(data.type))
                 holder.gesidTv.setText(data.gsid.toString())
-                holder.typeTv.setText(data.type.uppercase())
+                holder.typeTv.setText(data.type)
                 holder.descTv.setText(CheckSdkStatusManager.getInstance().getEventDesc(data.type, data.data))
                 holder.setVisible(instantData.isVisible)
                 holder.click(context, data.gsid, data.gsid)
