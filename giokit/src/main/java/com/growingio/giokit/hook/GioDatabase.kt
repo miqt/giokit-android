@@ -1,9 +1,9 @@
 package com.growingio.giokit.hook
 
+import android.text.TextUtils
 import com.growingio.giokit.GioKitImpl
 import com.growingio.giokit.launch.db.GioKitDbManager
 import com.growingio.giokit.launch.db.GioKitEventBean
-import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -20,38 +20,27 @@ object GioDatabase {
     @JvmStatic
     fun insertSaasEvent(data: String) {
         val gioEvent = GioKitEventBean()
-        gioEvent.data = data
-        gioEvent.status = GioKitEventBean.STATUS_READY
+        gioEvent.status = GioKitEventBean.STATUS_SENDED
         try {
-            val jsonObj = JSONObject(data)
-            var gsid = jsonObj.optInt("gesid")
-            if (gsid == 0) {
-                val eArry = jsonObj.optJSONArray("e") ?: JSONArray()
-                if (eArry.length() > 0) {
-                    gsid = eArry.getJSONObject(0).optInt("gesid")
-                }
+            val jsonObject = JSONObject(data)
+            gioEvent.data = jsonObject.toString(2)
+            gioEvent.time = jsonObject.optLong("itime")
+            gioEvent.gsid = 1
+            gioEvent.type =
+                if (jsonObject.has("event")) jsonObject.optString("event") else jsonObject.optString(
+                    "ltype"
+                )
+            val url = jsonObject.getJSONObject("lprops").optString("\$url")
+            if (!TextUtils.isEmpty(url)) {
+                gioEvent.path = url
             }
-            gioEvent.time = jsonObj.optLong("tm")
-            gioEvent.gsid = gsid.toLong()
-            val type = jsonObj.optString("t")
-            gioEvent.type = type
-            gioEvent.path = jsonObj.optString("p")
-            gioEvent.extra = getSaasEventExtra(type)
+            gioEvent.extra = "{a=1}"
         } catch (e: JSONException) {
         }
         GioKitDbManager.instance.insertEvent(gioEvent)
     }
 
-    private fun getSaasEventExtra(type: String): String {
-        return when (type) {
-            "activate", "reengage" -> "ctvt"
-            "cstm", "pvar", "evar", "ppl", "vstr" -> "cstm"
-            "page", "vst", "cls" -> "pv"
-            "clck", "chng" -> "other"
-            "imp" -> "imp"
-            else -> "empty"
-        }
-    }
+
 
     @JvmStatic
     fun removeSaasEvents(extra: String, lastId: String) {
