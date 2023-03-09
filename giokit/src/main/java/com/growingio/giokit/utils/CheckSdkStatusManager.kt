@@ -1,9 +1,6 @@
 package com.growingio.giokit.utils
 
-import com.growingio.android.sdk.TrackerContext
-import com.growingio.android.sdk.collection.GInternal
-import com.growingio.android.sdk.track.events.helper.DefaultEventFilterInterceptor
-import com.growingio.android.sdk.track.providers.ConfigurationProvider
+
 import com.growingio.giokit.hook.GioPluginConfig
 import com.growingio.giokit.hook.GioTrackInfo
 import com.growingio.giokit.hover.check.CheckItem
@@ -17,28 +14,16 @@ class CheckSdkStatusManager private constructor(val checkSdkStatus: CheckSdkStat
     CheckSdkStatusInterface by checkSdkStatus {
 
     fun getEventAlphaBet(eventType: String): String {
-        return if (GioPluginConfig.isSaasSdk) {
-            SdkSaasInfoUtils.getEventAlphaBet(eventType)
-        } else {
-            SdkV3InfoUtils.getEventAlphaBet(eventType)
-        }
+        return SdkV3InfoUtils.getEventAlphaBet(eventType)
     }
 
     fun getEventDesc(eventType: String, data: String): String {
-        return if (GioPluginConfig.isSaasSdk) {
-            SdkSaasInfoUtils.getEventDesc(eventType, data)
-        } else {
-            SdkV3InfoUtils.getEventDesc(eventType, data)
-        }
+        return SdkV3InfoUtils.getEventDesc(eventType, data)
+
     }
 
     fun eventFilterProxy() {
-        if (!GioPluginConfig.isSaasSdk && checkSdkInit()) {
-            if (!hasClass("com.growingio.android.sdk.track.events.EventFilterInterceptor")) return
-            val sdkEventFilter = ConfigurationProvider.core().eventFilterInterceptor;
-            ConfigurationProvider.core().eventFilterInterceptor =
-                GiokitEventFilterProxy(sdkEventFilter ?: DefaultEventFilterInterceptor())
-        }
+
     }
 
     fun getSdkDepend(index: Int): CheckItem {
@@ -66,26 +51,51 @@ class CheckSdkStatusManager private constructor(val checkSdkStatus: CheckSdkStat
 
         @JvmStatic
         fun getInstance(): CheckSdkStatusManager =
-            instance ?: synchronized(this) {
-                instance ?: CheckSdkStatusManager(
-                    if (GioPluginConfig.isSaasSdk) {
-                        CheckSdkStatusSaasImpl()
-                    } else {
-                        CheckSdkStatusV3Impl()
-                    }
-                ).apply {
-                    instance = this
+            CheckSdkStatusManager(object : CheckSdkStatusInterface {
+                override fun getProjectStatus(index: Int): CheckItem {
+                    return CheckItem(1, "loading", "title", "content", false);
+
                 }
-            }
+
+                override fun getURLScheme(index: Int): CheckItem {
+                    return CheckItem(1, "loading", "title", "content", false);
+                }
+
+                override fun getDataSourceID(index: Int): CheckItem {
+                    return CheckItem(1, "loading", "title", "content", false);
+
+                }
+
+                override fun getProjectID(index: Int): CheckItem {
+                    return CheckItem(1, "loading", "title", "content", false);
+
+                }
+
+                override fun getDataServerHost(index: Int): CheckItem {
+                    return CheckItem(1, "loading", "title", "content", false);
+
+                }
+
+                override fun getDataCollectionEnable(index: Int): CheckItem {
+                    return CheckItem(1, "loading", "title", "content", false);
+
+                }
+
+                override fun getSdkDebug(index: Int): CheckItem {
+                    return CheckItem(1, "loading", "title", "content", false);
+
+                }
+
+                override fun getSdkModules(index: Int): CheckItem {
+                    return CheckItem(1, "loading", "title", "content", false);
+
+                }
+
+            });
 
         fun checkSdkInit(): Boolean {
-            if (hasClass("com.growingio.android.sdk.TrackerContext")) {
-                return TrackerContext.initializedSuccessfully()
-            }
-            if (hasClass("com.growingio.android.sdk.collection.GInternal")) {
-                return !GInternal.getInstance().featuresVersionJson.isNullOrEmpty()
-            }
-            return false
+            // TODO: 初始化状态
+            return true
         }
 
         fun hasClass(className: String): Boolean {

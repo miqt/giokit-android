@@ -6,19 +6,6 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.os.Build
-import com.growingio.android.sdk.TrackerContext
-import com.growingio.android.sdk.autotrack.AutotrackConfig
-import com.growingio.android.sdk.autotrack.IgnorePolicy
-import com.growingio.android.sdk.autotrack.page.PageProvider
-import com.growingio.android.sdk.track.events.AutotrackEventType
-import com.growingio.android.sdk.track.events.TrackEventType
-import com.growingio.android.sdk.track.events.helper.EventExcludeFilter
-import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter
-import com.growingio.android.sdk.track.middleware.http.EventEncoder
-import com.growingio.android.sdk.track.providers.ConfigurationProvider
-import com.growingio.android.sdk.track.providers.DeviceInfoProvider
-import com.growingio.android.sdk.track.providers.SessionProvider
-import com.growingio.android.sdk.track.providers.UserInfoProvider
 import com.growingio.giokit.hook.GioPluginConfig
 import com.growingio.giokit.launch.sdkinfo.SdkInfo
 import org.json.JSONException
@@ -38,62 +25,8 @@ object SdkV3InfoUtils {
         if (hasDepend) {
             val (_, sdkVersion, _) = GioPluginConfig.analyseDepend()
             list.tryAdd { SdkInfo("SDK版本", sdkVersion) }
-            list.tryAdd { SdkInfo("项目ID", ConfigurationProvider.core().projectId) }
-            list.tryAdd { SdkInfo("URLScheme", ConfigurationProvider.core().urlScheme) }
-            val checkItem = CheckSdkStatusManager.getInstance().getDataSourceID(0)
-            list.tryAdd { SdkInfo("DataSource ID", checkItem.content) }
-            list.tryAdd {
-                SdkInfo(
-                    "DataServerHost",
-                    ConfigurationProvider.core().dataCollectionServerHost
-                )
-            }
-            list.tryAdd {
-                SdkInfo(
-                    "数据收集",
-                    if (ConfigurationProvider.core().isDataCollectionEnabled) "打开" else "关闭"
-                )
-            }
-            list.tryAdd {
-                SdkInfo(
-                    "Debug测试",
-                    if (ConfigurationProvider.core().isDebugEnabled) "是" else "否"
-                )
-            }
-            list.tryAdd {
-                SdkInfo(
-                    "集成模块",
-                    CheckSdkStatusManager.getInstance().getSdkModules(0).content
-                )
-            }
-            list.tryAdd { SdkInfo("分发渠道", ConfigurationProvider.core().channel) }
-            list.tryAdd {
-                SdkInfo(
-                    "每日流量限制",
-                    ConfigurationProvider.core().cellularDataLimit.toString() + "M"
-                )
-            }
-            list.tryAdd {
-                SdkInfo(
-                    "数据发送间隔",
-                    ConfigurationProvider.core().dataUploadInterval.toString() + "S"
-                )
-            }
-            list.tryAdd {
-                SdkInfo(
-                    "访问会话时长",
-                    ConfigurationProvider.core().sessionInterval.toString() + "S"
-                )
-            }
-            list.tryAdd { SdkInfo("事件过滤", getExcludeEvent()) }
-            list.tryAdd { SdkInfo("事件属性过滤", getIgnoreFiled()) }
-            val scale = getImpressionScale()
-            if (scale >= 0F) list.tryAdd { SdkInfo("曝光比例", scale.toString()) }
-            list.tryAdd { SdkInfo("数据加密", getEncryptEnabled()) }
-
-            list.tryAdd { SdkInfo("登录账户", getLoginUser()) }
-            list.tryAdd { SdkInfo("位置信息", getLocation()) }
-            list.tryAdd { SdkInfo("设备ID", DeviceInfoProvider.get().deviceId) }
+            list.tryAdd { SdkInfo("项目ID","我是项目id") }
+            list.tryAdd { SdkInfo("加密","RSA + AES") }
         } else {
             list.add(SdkInfo("SDK", "SDK未集成"))
         }
@@ -101,54 +34,6 @@ object SdkV3InfoUtils {
         return list
     }
 
-    private fun getEncryptEnabled(): String {
-        if (TrackerContext.get().registry.getModelLoader(EventEncoder::class.java) != null) {
-            return "启用"
-        }
-        return "未启用"
-    }
-
-    private fun getExcludeEvent(): String {
-        val excludeEventMask = ConfigurationProvider.core().excludeEvent
-        val events = EventExcludeFilter.getEventFilterLog(excludeEventMask)
-        if (events.isNullOrEmpty()) return "未设置"
-        return events.substringAfter("[").substringBefore("]")
-    }
-
-    private fun getIgnoreFiled(): String {
-        val ignoreMask = ConfigurationProvider.core().ignoreField
-        val fields = FieldIgnoreFilter.getFieldFilterLog(ignoreMask)
-        if (fields.isNullOrEmpty()) return "未设置"
-        return fields.substringAfter("[").substringBefore("]")
-    }
-
-    private fun getImpressionScale(): Float {
-        if (hasClass("com.growingio.android.sdk.autotrack.AutotrackConfig")) {
-            val config = ConfigurationProvider.get()
-                .getConfiguration<AutotrackConfig>(AutotrackConfig::class.java)
-            return config.impressionScale
-
-        }
-        return -1F
-    }
-
-    private fun getLoginUser(): String {
-        if (hasClass("com.growingio.android.sdk.track.providers.UserInfoProvider")) {
-            val userId = UserInfoProvider.get().loginUserId
-            return if (userId.isNullOrEmpty()) "未配置" else userId
-        }
-        return "未配置"
-    }
-
-    private fun getLocation(): String {
-        if (hasClass("com.growingio.android.sdk.track.providers.SessionProvider")) {
-            val la = SessionProvider.get().latitude
-            val lo = SessionProvider.get().longitude
-            if (la == 0.0 && lo == 0.0) return "未配置"
-            return "$la,$lo"
-        }
-        return "未配置"
-    }
 
     private fun hasClass(className: String): Boolean {
         try {
@@ -213,40 +98,14 @@ object SdkV3InfoUtils {
         list.tryAdd { SdkInfo("ROOT", DeviceUtils.isRoot(context).toString()) }
         list.tryAdd { SdkInfo("DENSITY", Resources.getSystem().displayMetrics.density.toString()) }
         list.tryAdd { SdkInfo("IP", DeviceUtils.getIPAddress(true)) }
-        if (hasClass("com.growingio.android.sdk.track.providers.DeviceInfoProvider")) {
-            list.tryAdd { SdkInfo("IMEI", DeviceInfoProvider.get().deviceId) }
-        }
-        if (hasClass("com.growingio.android.sdk.track.providers.DeviceInfoProvider")) {
-            list.tryAdd { SdkInfo("AndroidId", DeviceInfoProvider.get().androidId) }
-        }
-        if (hasClass("com.growingio.android.sdk.track.providers.DeviceInfoProvider")) {
-            DeviceInfoProvider.get().googleAdId?.let {
-                list.tryAdd { SdkInfo("GoogleId", it) }
-            }
-        }
+
         return list
     }
 
-    fun ignoreActivity(activity: Activity) {
-        if (hasClass("com.growingio.android.sdk.autotrack.page.PageProvider")) {
-            PageProvider.get().addIgnoreActivity(activity, IgnorePolicy.IGNORE_ALL)
-        }
-    }
+
 
     fun getEventAlphaBet(eventType: String): String {
-        return when (eventType) {
-            TrackEventType.VISITOR_ATTRIBUTES -> "VA"
-            TrackEventType.LOGIN_USER_ATTRIBUTES -> "UA"
-            TrackEventType.CONVERSION_VARIABLES -> "CV"
-            TrackEventType.APP_CLOSED -> "A"
-            AutotrackEventType.PAGE_ATTRIBUTES -> "PA"
-            AutotrackEventType.VIEW_CLICK -> "CK"
-            AutotrackEventType.VIEW_CHANGE -> "CG"
-            TrackEventType.FORM_SUBMIT -> "FS"
-            TrackEventType.REENGAGE -> "RG"
-            TrackEventType.ACTIVATE -> "AV"
-            else -> eventType.first().uppercase()
-        }
+        return "getEventAlphaBet"
     }
 
     fun getEventDesc(eventType: String, data: String): String {
@@ -260,20 +119,7 @@ object SdkV3InfoUtils {
             val p = jsonObj.optString("path")
             if (p.isNotEmpty()) return p
 
-            // visit
-            if (eventType == TrackEventType.VISIT) {
-                val userId = jsonObj.optString("userId")
-                if (userId.isNotEmpty()) return userId
-                val oaid = jsonObj.optString("oaid")
-                if (oaid.isNotEmpty()) return oaid
-                val adrid = jsonObj.optString("androidId")
-                if (adrid.isNotEmpty()) return adrid
-                return jsonObj.optString("domain")
-            }
 
-            if (eventType == TrackEventType.APP_CLOSED) {
-                return jsonObj.optString("timestamp")
-            }
             return jsonObj.optString("appName")
 
         } catch (e: JSONException) {

@@ -1,7 +1,5 @@
 package com.growingio.giokit.hook
 
-import com.growingio.android.sdk.track.events.base.BaseEvent
-import com.growingio.android.sdk.track.middleware.GEvent
 import com.growingio.giokit.GioKitImpl
 import com.growingio.giokit.launch.db.GioKitDbManager
 import com.growingio.giokit.launch.db.GioKitEventBean
@@ -71,25 +69,7 @@ object GioDatabase {
         }
     }
 
-    @JvmStatic
-    fun insertV3Event(gEvent: GEvent) {
-        if (gEvent is BaseEvent) {
-            val gioEvent = GioKitEventBean()
-            gioEvent.gsid = gEvent.globalSequenceId
-            gioEvent.status = GioKitEventBean.STATUS_READY
-            gioEvent.time = gEvent.timestamp
-            gioEvent.type = gEvent.eventType
-            gioEvent.extra = gEvent.eventType
 
-            try {
-                val jsonObj = gEvent.toJSONObject()
-                gioEvent.data = jsonObj.toString()
-                gioEvent.path = jsonObj.optString("path")
-            } catch (e: JSONException) {
-            }
-            GioKitDbManager.instance.insertEvent(gioEvent)
-        }
-    }
 
     @JvmStatic
     fun deleteEvent(id: Long) {

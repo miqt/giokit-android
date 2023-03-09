@@ -1,14 +1,10 @@
 package com.growingio.giokit.v3
 
 import android.app.Application
-import com.growingio.android.encoder.EncoderLibraryGioModule
-import com.growingio.android.hybrid.HybridLibraryGioModule
-import com.growingio.android.sdk.TrackerContext
-import com.growingio.android.sdk.autotrack.CdpAutotrackConfiguration
-import com.growingio.android.sdk.autotrack.GrowingAutotracker
-import com.growingio.android.sdk.track.events.helper.EventExcludeFilter
-import com.growingio.android.sdk.track.events.helper.FieldIgnoreFilter
+import com.dians.stc.ConfigBuilder
+import com.dians.stc.StcDians
 import com.growingio.giokit.GioKit
+import com.growingio.giokit.hook.GioDatabase
 
 /**
  * <p>
@@ -25,21 +21,28 @@ class App : Application() {
         GioKit.with(this).build()
     }
 
-    fun onTest() {
-        GrowingAutotracker.get().trackCustomEvent("test")
-        TrackerContext.initializedSuccessfully()
-    }
+
 
     fun initGioSdk() {
-        val config = CdpAutotrackConfiguration("91eaf9b283361032", "growing.8226cee4b794ebd0")
-            .setDataSourceId("951f87ed30c9d9a3")
-            .setDebugEnabled(true)
-            .setDataCollectionServerHost("http://117.50.105.254:8080")
-            .addPreloadComponent(EncoderLibraryGioModule())
-            .addPreloadComponent(HybridLibraryGioModule())
-            .setChannel("test")
+        //请务必在Application onCreate中初始化
+        //请务必在Application onCreate中初始化
+        StcDians.init(
+            applicationContext,
+            ConfigBuilder.withAppKey("testkey")
+                .setAutoHeatMap(false)
+                .setChannel("应用宝")
+                .setAutoTrackClick(true)
+                .setAutoTrackPageView(true)
+                .setAutoTrackFragmentPageView(false)
+                .setDebugMode(true) //上线时改为false
+                .builder(), null
+        ) // <--传入ids
 
-        GrowingAutotracker.startWithConfiguration(this, config)
-
+        // 同意true正常采集数据，不同意false停止采集工作。
+        // 同意true正常采集数据，不同意false停止采集工作。
+        StcDians.setDataCollectEnable(applicationContext, true)
+        StcDians.addEventListener {
+            GioDatabase.insertSaasEvent(it)
+        }
     }
 }

@@ -10,8 +10,6 @@ import android.webkit.WebViewClient;
 
 import androidx.annotation.Nullable;
 
-import com.growingio.android.sdk.autotrack.CdpAutotracker;
-import com.growingio.android.sdk.autotrack.GrowingAutotracker;
 
 /**
  * Created by liangdengke on 2018/11/27.
@@ -51,6 +49,5 @@ public class WebCircleHybridActivity extends Activity {
         webView.loadUrl("https://cn.bing.com/");
         //webView.loadUrl("https://www.baidu.com/");
 
-        GrowingAutotracker.get().bridgeWebView(webView);
     }
 }

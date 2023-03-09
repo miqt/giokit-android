@@ -1,9 +1,13 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+}
+// 易车埋点
+apply plugin: 'com.bitauto.track.plugin'
 
-    id 'com.growingio.android.autotracker'
-    id 'com.growingio.giokit'
+bitAutoConfig {
+    // 输出编译日志，排错使用
+    buildLog = true
 }
 
 android {
@@ -34,19 +38,9 @@ android {
     }
 }
 
-giokitExt {
-    debugMode true
-    enableRelease false
-    trackFinder {
-        enable = true
-        domain = ["com.growingio.giokit.v3"]
-    }
-}
 
-growingAutotracker {
-    logEnabled true
-    includePackages "com.growingio.giokit.v3"
-}
+
+
 
 dependencies {
     implementation rootProject.ext.dependencies["kotlin-stdlib"]
@@ -55,11 +49,7 @@ dependencies {
     implementation rootProject.ext.dependencies["material"]
     implementation rootProject.ext.dependencies["constraintLayout"]
 
-    implementation rootProject.ext.growingio["autotracker-cdp"]
-    implementation rootProject.ext.growingio["encoder"]
-    implementation rootProject.ext.growingio["urlconnection"]
-    implementation rootProject.ext.growingio["volley"]
-    implementation rootProject.ext.growingio["hybrid"]
+    implementation 'com.dians.stc:all:1.3.0.8'
     //implementation rootProject.ext.growingio["protobuf"]
     //debugImplementation "com.growingio.giokit:giokit:1.2.0-SNAPSHOT"
     //releaseImplementation "com.growingio.giokit:giokit-no-op:1.2.0-SNAPSHOT"

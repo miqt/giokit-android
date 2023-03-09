@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import com.growingio.android.sdk.autotrack.GrowingAutotracker
+import com.dians.stc.StcDians
 
 class SecondActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,7 +15,7 @@ class SecondActivity : AppCompatActivity() {
         val tv = findViewById<TextView>(R.id.track)
         tv.text = "custom track"
         tv.setOnClickListener {
-            GrowingAutotracker.get().trackCustomEvent("custom")
+            StcDians.track(applicationContext,"customEvent")
             startActivity(Intent(this, MainActivity::class.java))
         }
 
@@ -29,8 +29,6 @@ class SecondActivity : AppCompatActivity() {
     }
 
     fun justislongmethod() {
-        GrowingAutotracker.get().trackCustomEvent("longmethod")
-        GrowingAutotracker.get().trackCustomEvent("longmethod")
-        GrowingAutotracker.get().trackCustomEvent("longmethod")
+        StcDians.track(applicationContext,"customEvent")
     }
 }

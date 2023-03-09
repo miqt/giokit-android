@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import com.growingio.android.sdk.autotrack.GrowingAutotracker
+import com.dians.stc.StcDians
 import com.growingio.giokit.utils.NotificationUtils
 
 class MainActivity : AppCompatActivity() {
@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 
         val customBtn = findViewById<Button>(R.id.custom)
         customBtn.setOnClickListener {
-            GrowingAutotracker.get().trackCustomEvent("giokit")
+           StcDians.track(applicationContext,"customEvent")
             //GrowingAutotracker.get().setLoginUserId("cpacm")
             //GrowingAutotracker.get().setLocation(100.0, 100.0)
         }

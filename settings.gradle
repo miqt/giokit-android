@@ -1,5 +1,12 @@
 pluginManagement {
     repositories {
+        maven {
+            url 'https://norma.yiche.com/nexus/repository/yc-android-sdk/'
+            credentials {
+                username 'androidEventTrackSDK'
+                password 'Nexus.security.sdk2'
+            }
+        }
         mavenLocal()
         maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
         gradlePluginPortal()
@@ -20,7 +27,13 @@ pluginManagement {
 dependencyResolutionManagement {
     //repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        jcenter()
+        maven {
+            url 'https://norma.yiche.com/nexus/repository/yc-android-sdk/'
+            credentials {
+                username 'androidEventTrackSDK'
+                password 'Nexus.security.sdk2'
+            }
+        }
         mavenLocal()
         maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
         google()
@@ -33,7 +46,6 @@ rootProject.name = "GioKit"
 includeBuild 'giokit-plugin'
 
 include ':app'
-include ':app-saas'
 include ':uikit'
 include ':giokit'
 include ':giokit-no-op'
